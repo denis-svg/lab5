@@ -49,10 +49,10 @@ class PacMan(Mover):
             self.score += 1
             self.setDotEaten(self.dir)
         self.entity.move(self.dir)
-
-    def win(self):
-        return self.score == 55
     
+    def getScore(self):
+        return self.score
+        
     def reset(self, row, col):
         self.score = 0
         self.available = []
