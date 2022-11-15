@@ -27,8 +27,8 @@ class Ghost(Mover):
             dirs.append(dir)
         return dirs
 
-    def move(self):
-        if dir is None:
+    def moveRandom(self):
+        if self.dir is None:
             self.dir = self.getDir()
             self.available = self.getAllDirs()
         else:
@@ -51,6 +51,6 @@ class Ghost(Mover):
 
     def getCol(self):
         return self.entity.location.getCol()
-        
+
     def draw(self):
         self.entity.draw()

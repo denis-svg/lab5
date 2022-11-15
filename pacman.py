@@ -10,15 +10,6 @@ class PacMan(Mover):
         self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         self.available = []
         self.dir = None
-
-    def getDir(self):
-        d = {}
-        pos = choice(self.directions)
-        d[str(pos)] = True
-        while self.isWall(pos) and len(d) < 4:
-            pos = choice(self.directions)
-            d[str(pos)] =  True
-        return pos
     
     def getAllDirs(self):
         dirs = []
@@ -28,10 +19,23 @@ class PacMan(Mover):
             dirs.append(dir)
         return dirs
 
-    def move(self, ghosts):
-        if dir is None:
-            self.dir = self.getDir()
+    def getAllSmartDirs(self, ghosts):
+        dirs = []
+        for dir in self.available:
+            flag = True
+            for ghost in ghosts:
+                if ghost[0] == self.entity.location.getRow() + dir[0] and ghost[1] == self.entity.location.getCol() + dir[1]:
+                    flag = False
+                    break
+            if flag:
+                dirs.append(dir)
+        return dirs
+
+    def moveRandom(self):
+        # if the game just started pick a random available direction
+        if self.dir is None:
             self.available = self.getAllDirs()
+            self.dir = choice(self.available)
         else:
             av = self.getAllDirs()
             if self.dir not in av:
@@ -45,6 +49,34 @@ class PacMan(Mover):
 
                 self.dir = new_dir
             self.available = av
+        if self.isDot(self.dir) and not self.isEaten(self.dir):
+            self.score += 1
+            self.setDotEaten(self.dir)
+        self.entity.move(self.dir)
+
+    def moveSmart(self, ghosts):
+        # if the game just started pick a random available direction
+        if self.dir is None:
+            self.available = self.getAllDirs()
+            self.dir = choice(self.available)
+        else:
+            self.available = self.getAllDirs()
+            self.available = self.getAllSmartDirs(ghosts)
+
+            if len(self.available) >= 2:
+                flag = False
+                for dir in self.available:
+                    if self.isDot(dir) and not self.isEaten(dir):
+                        flag = True
+                        self.dir = dir
+                        break
+                if not flag:
+                    if self.dir not in self.available:
+                        self.dir = choice(self.available)
+            if len(self.available) == 1:
+                self.dir = self.available[0]
+            if len(self.available) == 0:
+                self.dir = (0, 0)
         if self.isDot(self.dir) and not self.isEaten(self.dir):
             self.score += 1
             self.setDotEaten(self.dir)
