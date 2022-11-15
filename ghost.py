@@ -3,10 +3,9 @@ from random import choice
 import pygame
 
 
-class PacMan(Mover):
+class Ghost(Mover):
     def __init__(self, row, col, maze, window) -> None:
-        super().__init__(row, col, pygame.transform.scale(pygame.image.load('images/right.png'), (50, 50)), maze, window)
-        self.score = 0
+        super().__init__(row, col, pygame.transform.scale(pygame.image.load('images/ghost.png'), (50, 50)), maze, window)
         self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         self.available = []
         self.dir = None
@@ -28,7 +27,7 @@ class PacMan(Mover):
             dirs.append(dir)
         return dirs
 
-    def move(self, ghosts):
+    def move(self):
         if dir is None:
             self.dir = self.getDir()
             self.available = self.getAllDirs()
@@ -45,19 +44,13 @@ class PacMan(Mover):
 
                 self.dir = new_dir
             self.available = av
-        if self.isDot(self.dir) and not self.isEaten(self.dir):
-            self.score += 1
-            self.setDotEaten(self.dir)
         self.entity.move(self.dir)
-    
-    def getScore(self):
-        return self.score
 
     def getRow(self):
         return self.entity.location.getRow()
 
     def getCol(self):
         return self.entity.location.getCol()
-
+        
     def draw(self):
         self.entity.draw()
