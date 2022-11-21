@@ -1,10 +1,12 @@
 import pygame
+import datetime
 from sys import exit
 from statistics import mean
 import matplotlib.pyplot as plt
 from maze import Maze
 from pacman import PacMan
 from ghost import Ghost
+from drawer import Drawer
 
 
 class Game:
@@ -16,10 +18,12 @@ class Game:
         self.players = []
         self.setEntities()
         self.scores = []
+        self.times = []
+        self.d = Drawer(self.window, self.maze)
 
     def setEntities(self):
-        self.ghosts = [Ghost(5, 5, self.maze, self.window), ]#Ghost(5, 6, self.maze, self.window)]
-        self.players = [PacMan(1, 1, self.maze, self.window), PacMan(1, 9, self.maze, self.window), PacMan(9, 1, self.maze, self.window)]
+        self.ghosts = [Ghost(5, 5, self.maze), Ghost(5, 6, self.maze), Ghost(5, 7, self.maze)]
+        self.players = [PacMan(1, 9, self.maze), PacMan(9, 1, self.maze)]
 
     def checkEvents(self):
         for event in pygame.event.get():
@@ -27,14 +31,13 @@ class Game:
                 plt.plot([i + 5 for i in range(len(self.scores))], self.scores, label="Average score ---> " + str(mean(self.scores)))
                 plt.legend()
                 plt.show()
+                plt.plot([i + 5 for i in range(len(self.times))], self.times, label="Average time ---> " + str(mean(self.times)))
+                plt.legend()
+                plt.show()
                 exit()
-    
+
     def draw(self):
-        self.maze.draw()
-        for player in self.players:
-            player.draw()
-        for ghost in self.ghosts:
-            ghost.draw()
+        self.d.draw(self.players, self.ghosts)
 
     def checkDead(self):
         new_p = []
@@ -42,7 +45,9 @@ class Game:
             flag = True
             for ghost in self.ghosts:
                 if player.getRow() == ghost.getRow() and player.getCol() == ghost.getCol():
-                    flag = False
+                    player.health -= 1
+                    if player.health == 0:
+                        flag = False
                     break
             if flag:
                 new_p.append(player)
@@ -55,22 +60,58 @@ class Game:
                 i += 1
         return i
 
-    def run(self):
+    def test(self):
         clock = pygame.time.Clock()
         while True:
-            clock.tick(0)
+            clock.tick(1)
             self.checkEvents()
-            self.window.fill((0, 0, 0))
+
+            for player in self.players:
+                player.moveRandom()
+            self.d.draw(self.players, self.ghosts)
+
+            self.checkDead()
+            if len(self.players) == 0:
+                self.setEntities()
+                self.maze.resetMaze()
+            self.d.draw(self.players, self.ghosts)
+            
+            if sum([player.getScore() for player in self.players]) == 55:
+                self.d.draw(self.players, self.ghosts)
+                self.setEntities()
+                self.maze.resetMaze()
+                continue
+
+            for ghost in self.ghosts:
+                ghost.moveRandom()
+            self.checkDead()
+            self.d.draw(self.players, self.ghosts)
+
+            if len(self.players) == 0:
+                self.setEntities()
+                self.maze.resetMaze()
+
+            self.d.draw(self.players, self.ghosts)
+
+    def run(self):
+        clock = pygame.time.Clock()
+        start = datetime.datetime.now()
+        while True:
+            clock.tick(2)
+            self.checkEvents()
             
             p_state = [(ghost.getRow(), ghost.getCol) for ghost in self.ghosts]
 
             for player in self.players:
-                player.moveSmart(p_state)
-                # player.moveRandom()
-                
+                player.moveRandom()
+                #player.moveRandom()
+
             self.draw()
             pygame.display.update()
             if sum([player.getScore() for player in self.players]) == 55:
+                total  = (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                self.times.append(total)
                 self.scores.append(55)
                 self.setEntities()
                 self.maze.resetMaze()
@@ -78,12 +119,18 @@ class Game:
 
             self.checkDead()
             if len(self.players) == 0:
+                total  = (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                self.times.append(total)
                 self.scores.append(self.getEatenDots())
                 self.setEntities()
                 self.maze.resetMaze()
                 continue
 
             if sum([player.getScore() for player in self.players]) == 55:
+                total  = (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                self.times.append(total)
                 self.scores.append(55)
                 self.setEntities()
                 self.maze.resetMaze()
@@ -96,12 +143,18 @@ class Game:
             pygame.display.update()
             self.checkDead()
             if len(self.players) == 0:
+                total  = (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                self.times.append(total)
                 self.scores.append(self.getEatenDots())
                 self.setEntities()
                 self.maze.resetMaze()
                 continue
             sc = self.getEatenDots()
             if sc == 55:
+                total  = (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                self.times.append(total)
                 self.scores.append(55)
                 self.setEntities()
                 self.maze.resetMaze()
@@ -109,4 +162,4 @@ class Game:
 
 if __name__ == '__main__':
     g = Game()
-    g.run()
+    g.test()

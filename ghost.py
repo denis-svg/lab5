@@ -4,8 +4,8 @@ import pygame
 
 
 class Ghost(Mover):
-    def __init__(self, row, col, maze, window) -> None:
-        super().__init__(row, col, pygame.transform.scale(pygame.image.load('images/ghost.png'), (50, 50)), maze, window)
+    def __init__(self, row, col, maze) -> None:
+        super().__init__(row, col, maze)
         self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         self.available = []
         self.dir = None
@@ -51,6 +51,3 @@ class Ghost(Mover):
 
     def getCol(self):
         return self.entity.location.getCol()
-
-    def draw(self):
-        self.entity.draw()

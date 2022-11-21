@@ -29,21 +29,14 @@ class Maze:
             if key not in self.dots:
                 row, col = key.split(";")
                 i += 1
-                self.dots[key] = Dot(int(row), int(col), [pygame.transform.scale(pygame.image.load('images/coin.png'), (50, 50)), 
-                                                pygame.transform.scale(pygame.image.load('images/no_coin.png'), (50, 50))], self.window)
+                self.dots[key] = Dot(int(row), int(col))
         
         for key in walls_loc.keys():
             if key not in self.walls:
                 row, col = key.split(";")
                 i += 1
-                self.walls[key] = Wall(int(row), int(col), pygame.transform.scale(pygame.image.load('images/wall.png'), (50, 50)), self.window)
+                self.walls[key] = Wall(int(row), int(col))
 
-    def draw(self):
-        for key in self.dots.keys():
-            self.dots[key].draw()
-        for key in self.walls.keys():
-            self.walls[key].draw()
-    
     def isWall(self, row, col):
         key = str(row) + ';' + str(col)
         if key in self.walls:

@@ -4,12 +4,13 @@ import pygame
 
 
 class PacMan(Mover):
-    def __init__(self, row, col, maze, window) -> None:
-        super().__init__(row, col, pygame.transform.scale(pygame.image.load('images/right.png'), (50, 50)), maze, window)
+    def __init__(self, row, col, maze) -> None:
+        super().__init__(row, col, maze)
         self.score = 0
         self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         self.available = []
         self.dir = None
+        self.health = 1
     
     def getAllDirs(self):
         dirs = []
@@ -90,6 +91,3 @@ class PacMan(Mover):
 
     def getCol(self):
         return self.entity.location.getCol()
-
-    def draw(self):
-        self.entity.draw()

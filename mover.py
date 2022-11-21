@@ -1,8 +1,8 @@
 from entity import Entity
 
 class Mover:
-    def __init__(self, row, col, image, maze, window) -> None:
-        self.entity = Entity(row, col, image, window)
+    def __init__(self, row, col, maze) -> None:
+        self.entity = Entity(row, col)
         self.maze = maze
 
     def isWall(self, pos):
